@@ -26,7 +26,3 @@ s3_bucket = 'trending-tv-shows'
 s3_key_tweet = 'tweet_raw'
 s3_key_tmdb = 'tmdb_raw'
 s3_upload_try = 5
-
-# TV shows filepath
-tv_shows_fname = 'tv_shows.csv'
-tv_shows_fpath = os.path.join(os.getcwd(), tv_shows_fname)
