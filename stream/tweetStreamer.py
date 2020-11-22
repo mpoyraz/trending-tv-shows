@@ -53,6 +53,11 @@ class TweetStreamListener(tweepy.StreamListener):
         Returns:
         boolean : True continues to stream and False disconnects 
         """
+        # Check stream duration limit
+        if (datetime.now()-self.time_start).total_seconds() >= self.limit_time:
+            logging.info('Reached {} seconds time limit, disconnecting from the stream'.format(self.limit_time))
+            logging.info('Streamed {} tweets in this session'.format(self.count))
+            return False
         # Log the number of tweets streamed
         if self.count % self.numReport == 0:
             logging.info('Number of tweets streamed since the start: {}'.format(self.count))
@@ -68,13 +73,9 @@ class TweetStreamListener(tweepy.StreamListener):
         except sqlite3.Error as e:
             logging.error(str(e))
             logging.error('Tweet {} could not be inserted into the table'.format(tweet_id))
-        # Check streaming limits
+        # Check stream count limit
         if self.count >= self.limit_count:
             logging.info('Reached {} tweets limit, disconnecting from the stream'.format(self.count))
-            return False
-        if (datetime.now()-self.time_start).total_seconds() >= self.limit_time:
-            logging.info('Reached {} seconds time limit, disconnecting from the stream'.format(self.limit_time))
-            logging.info('Streamed {} tweets in this session'.format(self.count))
             return False
         return True
 
@@ -88,7 +89,7 @@ class TweetStreamListener(tweepy.StreamListener):
         boolean : True tries to reconnect and False disconnects 
         """
         logging.error('Stream listener encountered error, status code: {}'.format(status_code))
-        # Check time limit
+        # Check stream duration limit
         if (datetime.now()-self.time_start).total_seconds() >= self.limit_time:
             logging.info('Reached {} seconds time limit, disconnecting from the stream'.format(self.limit_time))
             logging.info('Streamed {} tweets in this session'.format(self.count))
