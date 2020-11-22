@@ -1,6 +1,7 @@
 import os
 import sys
 import logging
+import argparse
 import configparser
 import json
 import time
@@ -9,7 +10,7 @@ import boto3
 from botocore.exceptions import ClientError
 from tmdbv3api import TMDb, TV, Discover
 from datetime import date, datetime
-from settings import dirTmdb, dirLogs, tv_shows_fpath, s3_bucket, s3_key_tmdb, s3_upload_try
+from settings import dirTmdb, dirLogs, s3_bucket, s3_key_tmdb, s3_upload_try
 from utils import createDir, setupLogger, uploadFileToS3
 
 def initTmdb(api_key):
@@ -137,6 +138,17 @@ def saveTmdbLocal(tv_shows_data, local_path):
     return isSuccess
 
 if __name__ == "__main__":
+    # Parse arguments
+    parser = argparse.ArgumentParser(
+        description="Upload TMDB TV show data to S3",
+        add_help=True
+    )
+    parser.add_argument("path_config", type=str,
+                        help="Path to configuration file with API credentials")
+    parser.add_argument("path_tv_show", type=str,
+                        help="Path to the CSV file with TV show information")
+    args = parser.parse_args()
+
     # Create the required directories if not exits
     if not createDir(dirLogs):
         sys.exit('The directory "{}" could not be created'.format(dirLogs))
@@ -149,13 +161,13 @@ if __name__ == "__main__":
 
     # Read the API configuration file
     config = configparser.ConfigParser()
-    config.read('api.cfg')
+    config.read(args.path_config)
 
     # Initialize TMDB object
     tmdb = initTmdb(config.get('TMDB','API_KEY'))
 
     # Get the TV shows id
-    tv_shows_id = getTVShowsId(tv_shows_fpath)
+    tv_shows_id = getTVShowsId(args.path_tv_show)
 
     # Query each TV show details
     tv_shows_data = queryTVShowsFromTmdb(tv_shows_id)
@@ -197,5 +209,5 @@ if __name__ == "__main__":
         else:
             logging.warning('Waiting 2 seconds and will try to upload to S3 again')
             time.sleep(2)
-            
+
     sys.exit(0)

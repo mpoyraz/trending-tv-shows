@@ -1,6 +1,7 @@
 import os
 import sys
 import logging
+import argparse
 import configparser
 import sqlite3
 import time
@@ -112,6 +113,15 @@ def saveTweetsLocal(df, local_path):
     return isSuccess
 
 if __name__ == "__main__":
+    # Parse arguments
+    parser = argparse.ArgumentParser(
+        description="Upload TMDB TV show data to S3",
+        add_help=True
+    )
+    parser.add_argument("path_config", type=str,
+                        help="Path to configuration file with API credentials")
+    args = parser.parse_args()
+
     # Create the required directories if not exits
     if not createDir(dirLogs):
         sys.exit('The directory "{}" could not be created'.format(dirLogs))
@@ -169,7 +179,7 @@ if __name__ == "__main__":
 
     # Read the API configuration file
     config = configparser.ConfigParser()
-    config.read('api.cfg')
+    config.read(args.path_config)
 
     # Upload the file to S3
     for i in range(s3_upload_try):
