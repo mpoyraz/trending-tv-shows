@@ -138,6 +138,8 @@ def saveTmdbLocal(tv_shows_data, local_path):
 
 if __name__ == "__main__":
     # Create the required directories if not exits
+    if not createDir(dirLogs):
+        sys.exit('The directory "{}" could not be created'.format(dirLogs))
     if not createDir(dirTmdb):
         sys.exit('The directory "{}" could not be created'.format(dirTmdb))
 
