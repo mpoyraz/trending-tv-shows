@@ -19,7 +19,7 @@ tbName = 'tweets'
 
 # Tweet streaming limits per hour
 streamCount = 5000
-streamPeriod = 30 # seconds
+streamPeriod = 3000 # seconds
 
 # S3 parameters
 s3_bucket = 'trending-tv-shows'
