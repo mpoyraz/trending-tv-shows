@@ -23,7 +23,7 @@ tweet_stat_path = '{}/tweet_stat'.format(data_path)
 # Execution dates with different formats
 exec_date = '{{ ds }}'
 exec_date_formatted = '{{ macros.ds_format(ds, "%Y-%m-%d", "%Y/%m/%d") }}'
-exec_date_partitioned = '{{ macros.ds_format(ds, "%Y-%m-%d", "year=%Y/month=%m/day=%d") }}'
+exec_date_partitioned = '{{ macros.ds_format(ds, "%Y-%m-%d", "year=%Y/month=%-m/day=%-d") }}'
 
 # Default args for the dag
 DEFAULT_ARGS = {
