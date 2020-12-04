@@ -165,7 +165,7 @@ Linux Cron jobs are setup to perform the following:
 
 Fact tables `tweet_stat` and `tmdb_stat` are stored in Parquet file format and partitioned by year, month and day. This allows very efficient reading and minimize IO. Dimention tables are queried from TMDB API and are relatively small in size, they are stored as CSV files.
 
-There are 2 DAGs defined:
+There are 2 DAGs defined and both are scheduled to run at daily intervals:
  1. ETL Tweet DAG to process raw tweets on on-demand EMR clusters using Apache Spark
     ![image](https://github.com/mpoyraz/trending-tv-shows/blob/master/images/tweet_dag.PNG)
  2. ETL TMDB DAG to process raw TMDB data on on-demand EMR clusters using Apache Spark
@@ -196,5 +196,11 @@ EmrJobFlowSensor is used to monitor the execution of the EMR job flow. It report
 
 The same `S3DataQualityOperator` is also used as the last task. Fact table Parquet partition correspond to the execution date is checked. If no key is found under the partition, it means that ETL failed for that day and value error is raised.
 
+## ETL Execution
+The data from Twitter and TMDB API was collected for 9 days, from Nov 23 to Dec 1. 120K tweets were streamed per day and 1.08 million tweets were collected in total.
 
-
+ETL was performed after the data collection and the start & end date of the DAGs were adjusted to run backfill for these 9 days. Both DAGs were scheduled to run at daily intervals and tree views of the Airflow DAG execution are as follows:
+ - ETL Tweet DAG run:
+   ![image](https://github.com/mpoyraz/trending-tv-shows/blob/master/images/tweet_dag_run.PNG)
+ - ETL TMDB DAG run:
+   ![image](https://github.com/mpoyraz/trending-tv-shows/blob/master/images/tmdb_dag_run.PNG)
