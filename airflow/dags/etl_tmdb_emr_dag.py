@@ -101,7 +101,9 @@ JOB_FLOW_OVERRIDES = {
 # Create the dag with default args
 dag = DAG(dag_id='etl_tmdb_emr',
           default_args=DEFAULT_ARGS,
-          start_date=datetime.now(),
+          start_date=datetime(2020, 11, 23),
+          end_date=datetime(2020, 12, 1),
+          max_active_runs=4,
           schedule_interval='@daily',
 )
 
