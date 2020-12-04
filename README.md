@@ -137,15 +137,22 @@ The data pipeline from APIs to final analytics tables on Data Lake is illustrate
 As we can see from the image above, there are 2 main parts in this data pipeline: Streaming and ETL.
 
 ## Streaming Pipeline
-A single AWS Lightsail instance is created for batch upload of Twitter and TMDB data into the Data Lake on S3.
+A single AWS Lightsail instance is created for streaming and batch upload of Twitter and TMDB data into the Data Lake on S3.
 
 Twitter Standard API has rate limits, therefore a very modest Lightsail Ubuntu instance with 1vCPU, 512 MB RAM and 20 GB SSD configuration is used.
+
+Python 3.7 and required libraries are installed on the Ubuntu instance:
+ - `bash lightsail/install_python.sh`
+ - `pip3 install -r lightsail/requirements.txt`
+
 Linux Cron jobs are setup to perform the following:
  - 5000 tweets are streamed per hour and tweets are streamed directly into a local SQLite database as raw JSON.
  - The tweets streamed in the past hour are uploaded to S3 as JSON file and the raw tweets data partitioned by year/month/day/hour. Example S3 path:  `s3://trending-tv-shows/tweet_raw/2020/11/23/00/2020-11-23-00.json`.
  - The TMDB TV show data is queried from TMDB API daily and TV show data uploaded S3 as JSON file and the raw TMDB data partitioned by year/month/day. Example S3 path: `s3://trending-tv-shows/tmdb_raw/2020/11/23/2020-11-23.json`.
  
- The exact setup for the Cron jobs are available at -TDB-
+ The exact setup for the cron jobs are available at [crontab.txt](https://github.com/mpoyraz/trending-tv-shows/blob/master/lightsail/crontab.txt).
+  - Run `crontab -e` and then copy & paste the content of [crontab.txt](https://github.com/mpoyraz/trending-tv-shows/blob/master/lightsail/crontab.txt) to setup the cron jobs.
+  - Run `crontab -l` to see the list of cron jobs.
  
  ## ETL Pipeline
  ETL jobs are fully owned and orchestrated by Apache Airflow data pipelines. Before going into details of Airflow DAGs, I would like to talk about the general strategy for storage and processing.
