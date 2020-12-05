@@ -204,3 +204,26 @@ ETL was performed after the data collection and the start & end date of the DAGs
    ![image](https://github.com/mpoyraz/trending-tv-shows/blob/master/images/tweet_dag_run.PNG)
  - ETL TMDB DAG run:
    ![image](https://github.com/mpoyraz/trending-tv-shows/blob/master/images/tmdb_dag_run.PNG)
+
+# Data Analytics
+The goal of the project was to create analytics tables that would allow tracking popular & trending TV shows. After ETL execution is completed, the analytics tables are stored in the Data Lake hosted on S3. They are also made available in this repo under [data](https://github.com/mpoyraz/trending-tv-shows/tree/master/data) directory.
+
+An analytics notebook [analyze_tvshow_popularity](https://github.com/mpoyraz/trending-tv-shows/blob/master/analytics/analyze_tvshow_popularity.ipynb) is also provided with example queries and visualizations. 2 queries and their visualizations are shown below:
+ - Top 25 Popular TV shows based on total hashtag counts:
+   ![image](https://github.com/mpoyraz/trending-tv-shows/blob/master/images/top_tvshow_hashtag.PNG)
+ - Hashtag counts of these 25 TV shows for each day:
+   ![image](https://github.com/mpoyraz/trending-tv-shows/blob/master/images/tvshow_hashtag_heatmap.PNG)
+
+# Other Scenarios
+The data pipeline in this project is designed and executed with a very small budget (~ 5$) but it is ready to scale with minor tweeks.
+ - Apache Airflow is used to automate ETL pipelines in a robust and reproducible way.
+ - ETL processing is performed with Apache Spark on AWS EMR (on-demand) cluster and this can be scaled easily if data sizes increases.
+
+### Case1: The data was increased by 100x
+In the streaming part, AWS Kinesis with Spark or Kafka streaming can be used to directly stream into S3 buckets. As mentioned above, ETL pipeline is ready to scale and simply EMR clusters with more worker nodes and/or more memory and CPUs could be spun-up.
+
+### Case2: The pipelines would be run on a daily basis by 7 am every day.
+ETL pipeline is owned and managed by Airflow and ETL DAGs are already scheduled at daily intervals. DAGs schedule intervals needs to be set to  `0 7 */1 * *` to run at 7 am every day and an offset for the hour may be required depending on the timezone.
+
+### Case3: The database needed to be accessed by 100+ people.
+In this case, data on S3 can be accessed & queried through AWS Redshift as external tables. Another choice would be to create Redshift tables by importing data from S3. Redshift cluster can be scaled to support requests from 100+ users.
